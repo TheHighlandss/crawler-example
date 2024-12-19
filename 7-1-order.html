@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+<text-shuffle></text-shuffle>
+
+<script>
+  class TextShuffle extends HTMLElement {
+    constructor() {
+      super();
+      //  shadow DOM,创建封装的组件并实现样式隔离, 与主文档的 DOM 树相互隔离
+      this.attachShadow({ mode: 'open' }); // mode为closed时外部js无法访问根节点shadowRoot
+      this.text = 'hello,world';
+      this.render();
+    }
+
+    shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    render() {
+      const shuffledText = this.shuffleArray(this.text.split('').map((i,index) => ({val:i, order:index})));
+
+      const container = document.createElement('div');
+      container.style.display = 'inline-flex';
+
+      shuffledText.forEach((item, index) => {
+        const charElement = document.createElement('i');
+        charElement.textContent = item.val;
+        charElement.style.order = item.order;
+        container.appendChild(charElement);
+      });
+
+      this.shadowRoot.innerHTML = '';
+      this.shadowRoot.appendChild(container);
+      this.text = ''
+    }
+  }
+
+  // 注册自定义元素
+  customElements.define('text-shuffle', TextShuffle);
+
+  const textShuffleElement = document.querySelector('text-shuffle');
+  console.log(textShuffleElement.shadowRoot);
+  console.log(textShuffleElement.shadowRoot.innerHTML);
+  console.log(textShuffleElement.text);
+</script>
+
+</body>
+</html>
